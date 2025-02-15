@@ -18,14 +18,22 @@ MessageList = []                                           # To store hash of GO
 connect_seed_addr = []                                     # To store seed address to which peer is connected
 
 # Write the outputs to the file
-def write_output_to_file(output):
+def write_output_to_file(message):
     try:
-        file = open("outputpeer.txt", "a")  
-        file.write(output + "\n") 
-    except:
+        with open("outputpeer.txt", "a") as file:
+            if isinstance(message, dict):
+                # This is a peer connection message
+                output = f"Address: {message['address']}, Degree: {message['degree']}\n"
+            elif isinstance(message, str) and message.startswith("Dead Node:"):
+                # This is a dead node report
+                output = f"{message}\n"
+            else:
+                # For any other type of message
+                output = f"{message}\n"
+            file.write(output)
+    except IOError:
         print("Write Failed")
-    finally:
-        file.close()
+
 
 # Class of Peer objects 
 class Peer: 
@@ -93,6 +101,25 @@ def bind_socket():
         print("Socket Binding Error")
         bind_socket()
 
+def increment_degree_on_seeds():
+    MY_ADDRESS = f"{MY_IP}:{PORT}"
+    for seed_addr in connect_seed_addr:
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            seed_addr = seed_addr.split(":")
+            ADDRESS = (str(seed_addr[0]), int(seed_addr[1]))
+            sock.connect(ADDRESS)
+            
+            increment_message = f"INCREMENT:{MY_ADDRESS}"
+            sock.send(increment_message.encode('utf-8'))
+            
+            response = sock.recv(1024).decode('utf-8')
+            print(f"Degree increment response from seed {response}")
+            
+            sock.close()
+        except:
+            print(f"Failed to increment degree on seed {seed_addr}")
+
 # To handle different connected peers in different thread.It recieves messages from peer.
 # According to the type of message received take appropriate actions
 def handle_peer(conn, addr):
@@ -107,6 +134,7 @@ def handle_peer(conn, addr):
                     if(len(peers_connected) < 4):
                         conn.send("New Connect Accepted".encode('utf-8'))
                         peers_connected.append( Peer(str(addr[0])+":"+str(message[2])) )
+                        increment_degree_on_seeds()
                 elif "Liveness Request" in message[0]:            # If its liveness request then give back liveness reply              
                     liveness_reply = "Liveness Reply:" + str(message[1]) + ":" + str(message[2]) + ":" + str(MY_IP) + ":" + str(PORT)
                     conn.send(liveness_reply.encode('utf-8'))
@@ -127,47 +155,115 @@ def begin():
         thread.start()
         
 # This function receives complete list of peers and set of random index of peers to connect to and connect to them
-def connect_peers(complete_peer_list, selected_peer_nodes_index):
-    for i in selected_peer_nodes_index:
+def connect_peers(selected_peers):
+    for peer in selected_peers:
         try:
-            sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-            peer_addr = complete_peer_list[i].split(":")
-            ADDRESS = (str(peer_addr[0]), int(peer_addr[1]))
-            sock.connect(ADDRESS)
-            peers_connected.append( Peer(complete_peer_list[i]) )
-            message = "New Connect Request From:"+str(MY_IP)+":"+str(PORT)
-            sock.send(message.encode('utf-8'))
-            print(sock.recv(1024).decode('utf-8'))
+            # Your existing connection logic here
+            # For example:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            ip, port = peer['address'].split(':')
+            sock.connect((ip, int(port)))
+            
+            # Send connection request
+            request = f"New Connect Request From:{MY_IP}:{PORT}"
+            sock.send(request.encode('utf-8'))
+            
+            # Wait for response
+            response = sock.recv(1024).decode('utf-8')
+            
+            if response == "New Connect Accepted":
+                peers_connected.append(Peer(peer['address']))
+                print(f"Successfully connected to {peer['address']}")
+                increment_degree_on_seeds()
+            else:
+                print(f"Connection rejected by {peer['address']}")
+            
             sock.close()
-        except:
-            print("Peer Connection Error")
+        except Exception as e:
+            print(f"Failed to connect to {peer['address']}: {str(e)}")
 
-# This function takes complete list of peers and find a random no. of peers to connect to b/w 1 and 4 and then generate a set of random no. that size    
+    print(f"Connected to {len(peers_connected)} peers")
+
 def join_atmost_4_peers(complete_peer_list):
     if len(complete_peer_list) > 0:
-        limit = min(random.randint(1, len(complete_peer_list)), 4)    # Since we wanna connect to atmost 4 random peers we find a random no. of peers to connect b/w 1 and 4
-        selected_peer_nodes_index = generate_k_random_numbers_in_range(0, len(complete_peer_list) - 1, limit)  # This generate "limit" no. of index of peers to connect to
+        # Determine the number of peers to connect to (1 to 4, or less if fewer peers are available)
+        limit = min(random.randint(1, len(complete_peer_list)), 4)
+        
+        # Randomly select peers to connect to
+        selected_peers = random.sample(complete_peer_list, limit)
+        
+        print("Trying to connect to peers:")
+        for peer in selected_peers:
+            print(f"Address: {peer['address']}, Degree: {peer['degree']}")
+        
+        connect_peers(selected_peers)
 
-        print("Trying to connect to peers : ", selected_peer_nodes_index)
-        connect_peers(complete_peer_list, selected_peer_nodes_index)
+
+
 
 # It take complete peer list separated by comma from each seed and union them all
 def union_peer_lists(complete_peer_list):
     global MY_IP
-    complete_peer_list = complete_peer_list.split(",")
-    complete_peer_list.pop()
-    temp = complete_peer_list.pop()
-    temp = temp.split(":")
-    MY_IP = temp[0]
-    for i in complete_peer_list:
-        if i:
-            peer_set_from_seed.add(i)
-    complete_peer_list = list(peer_set_from_seed)
+    global PORT
+    global peer_set_from_seed
+
+    # Clear the existing set
+    peer_set_from_seed = set()
+
+    # Split the received string into individual peer entries
+    peer_entries = complete_peer_list.split(";")
+
+    for entry in peer_entries:
+        if entry:
+            parts = entry.split(":")
+            if len(parts) >= 3:
+                address = f"{parts[0]}:{parts[1]}"  # Combine IP and port
+                degree = int(parts[2])
+                peer_set_from_seed.add((address, degree))
+
+    # Extract MY_IP from the last entry (assuming it's still included)
+    if peer_entries:
+        last_entry = peer_entries[-1].split(":")
+        if len(last_entry) >= 1:
+            MY_IP = last_entry[0]
+
+    # Convert the set back to a list of dictionaries
+    complete_peer_list = [{"address": addr, "degree": deg} for addr, deg in peer_set_from_seed]
+
+    # Remove self peer
+    self_address = f"{MY_IP}:{PORT}"
+    complete_peer_list = [peer for peer in complete_peer_list if peer['address'] != self_address]
+
     return complete_peer_list
+
+
+
+
+
+def update_degree_to_seeds(new_degree):
+    for seed_addr in connect_seed_addr:
+        try:
+            sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+            seed_addr = seed_addr.split(":")
+            ADDRESS = (str(seed_addr[0]), int(seed_addr[1]))
+            sock.connect(ADDRESS)
+            
+            MY_ADDRESS = str(MY_IP)+":"+str(PORT)
+            update_message = f"UPDATE:{MY_ADDRESS}:{new_degree}"
+            sock.send(update_message.encode('utf-8'))
+            
+            response = sock.recv(1024).decode('utf-8')
+            print(f"Degree update response from seed {seed_addr}: {response}")
+            
+            sock.close()
+        except:
+            print(f"Failed to update degree to seed {seed_addr}")
+
 
 # This function is used to connect to seed and send our IP address and port info to seed and then receives a list of peers connected to that seed separated by comma
 # After finding union it calls join_atmost_4_peers to connect to atmost peers
 def connect_seeds():
+    all_peer_lists = []
     for i in range(0, len(connect_seed_addr)):
         try:
             sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
@@ -175,16 +271,35 @@ def connect_seeds():
             ADDRESS = (str(seed_addr[0]), int(seed_addr[1]))
             sock.connect(ADDRESS)
             MY_ADDRESS = str(MY_IP)+":"+str(PORT)
-            sock.send(MY_ADDRESS.encode('utf-8'))
+            
+            # Send address with initial degree 0
+            message = f"{MY_ADDRESS}:0"
+            sock.send(message.encode('utf-8'))
+            
             message = sock.recv(10240).decode('utf-8')
-            complete_peer_list = union_peer_lists(message)
-            for peer in complete_peer_list:
-                write_output_to_file(peer)
+            print(f"Peer List received from seed {i+1} :- ", message)
+            all_peer_lists.append(message)
             sock.close()
         except:
-            print("Seed Connection Error")
-    print("Peers List received from all seeds : ", complete_peer_list)
-    join_atmost_4_peers(complete_peer_list)
+            print(f"Seed Connection Error for seed {i+1}")
+
+    # Combine all received peer lists
+    combined_peer_list = ";".join(all_peer_lists)
+    
+    # Now perform the union operation on the combined list
+    complete_peer_list = union_peer_lists(combined_peer_list)
+    print("Peer List after processing all seeds:- ", complete_peer_list)
+    
+    for peer in complete_peer_list:
+        write_output_to_file(peer)
+
+    # Power Law function to calculate degree and connect to relevant peers
+    newDegree = join_atmost_4_peers(complete_peer_list)
+    
+    # After joining peers, update the degree
+    update_degree_to_seeds(newDegree)
+
+
 
     
 
@@ -200,7 +315,7 @@ def register_with_k_seeds():   # where k = floor(n / 2) + 1
 
 # This function takes address of peer which is down. Generate dead node message and send it to all connected seeds
 def report_dead(peer):
-    dead_message = "Dead Node:" + peer + ":" + str(timestamp()) + ":" + str(MY_IP)
+    dead_message = f"Dead Node:{peer}:{timestamp()}:{MY_IP}"
     print(dead_message)
     write_output_to_file(dead_message)
     for seed in connect_seed_addr:        
