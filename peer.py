@@ -156,6 +156,9 @@ def begin():
         
 # This function receives complete list of peers and set of random index of peers to connect to and connect to them
 def connect_peers(selected_peers):
+    if(len(selected_peers) == 0):
+        print("No peers found to connect")
+        return 0
     for peer in selected_peers:
         try:
             # Your existing connection logic here
@@ -196,7 +199,9 @@ def join_atmost_4_peers(complete_peer_list):
         for peer in selected_peers:
             print(f"Address: {peer['address']}, Degree: {peer['degree']}")
         
-        connect_peers(selected_peers)
+        return connect_peers(selected_peers)
+    else:
+        return 0
 
 
 
@@ -295,6 +300,8 @@ def connect_seeds():
 
     # Power Law function to calculate degree and connect to relevant peers
     newDegree = join_atmost_4_peers(complete_peer_list)
+
+    print("The new degree of the peer is : ", newDegree)
     
     # After joining peers, update the degree
     update_degree_to_seeds(newDegree)

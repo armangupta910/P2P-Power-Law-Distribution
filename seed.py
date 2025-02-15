@@ -90,16 +90,17 @@ def handle_peer(conn, addr):
             if message:
                 if message.startswith("INCREMENT:"):
                     # Handle degree increment
-                    _, peer_address = message.split(":")
-                    print("Received Increment request from :- ", peer_address)
-                    response = incrementDegreeOfPeer(peer_address)
+                    _, peer_address, peer_port = message.split(":")
+                    print("Received Increment request from :- ", peer_address+":"+peer_port)
+                    response = incrementDegreeOfPeer(peer_address+":"+peer_port)
                     conn.send(response.encode('utf-8'))
 
                 elif message.startswith("UPDATE:"):
                     # Handle degree update
+                    print("Degree Update Request Received :- ", message)
                     _, peer_address, peer_port,  new_degree = message.split(":")
-                    update_peer_degree(peer_address, int(new_degree))
-                    conn.send("Degree updated successfully - {peer_address}:{peer_port}}".encode('utf-8'))
+                    update_peer_degree(peer_address+peer_port, int(new_degree))
+                    conn.send(f"Degree updated successfully - {peer_address}:{peer_port}".encode('utf-8'))
 
                 elif "Dead Node" in message[0:9]:
                     remove_dead_node(message)
