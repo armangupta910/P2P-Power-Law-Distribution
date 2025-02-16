@@ -1,5 +1,45 @@
-Description of the code:
+Gossip Protocol Implementation in P2P Network
 
+Overview
+This project implements a Gossip protocol over a peer-to-peer (P2P) network to broadcast messages and check the liveness of connected peers. The system consists of two main components: Seed Nodes and Peer Nodes.
+
+Key Concepts
+1.Seed Node System:
+	a.Seed nodes bootstrap new peers into the network.
+	b.New peers connect to ⌊(n/2)⌋ + 1 randomly chosen seed nodes out of n available seeds.
+	c.Seed nodes provide initial peer lists to new peers, helping them discover existing nodes.
+
+2.Gossip Protocol:
+	a.Peers generate and send gossip messages every 5 seconds, for a total of 10 messages.
+	b.A Message List (ML) is maintained to prevent message flooding and loops in the network.
+	c.Received gossip messages are forwarded to connected peers if they haven't been seen before.
+
+3.Liveness Checking:
+	a.Peers send liveness requests to connected peers every 13 seconds.
+	b.If three consecutive replies are not received, the peer is reported as dead.
+	c.Dead node information is sent to all connected seed nodes for network maintenance.
+
+4.Multithreading:
+	a.The implementation uses three threads for different tasks:
+	b.Listening for incoming connections
+	c.Performing liveness testing
+	d.Generating and propagating gossip messages
+
+5. Power Law Distribution:
+	a.Implemented in the peer selection process.
+	b.Peers are sorted based on their degree (number of connections) in descending order.
+	c.The top n/2 peers are selected, where n is the total number of peers in the network.
+	d.This creates a network topology where some nodes have many connections while others have few.
+
+6.Degree Management
+	a.The implementation maintains and updates the degree (number of connections) for each peer:
+	b.Initial degree: When a peer joins the network, it starts with a degree of 0.
+	c.Degree incrementation: The increment_degree_on_seeds() function is called when a new connection is established, increasing the peer's degree on all connected	seed nodes.
+	d.Degree updates: The update_degree_to_seeds() function informs seed nodes of a peer's current degree after connecting to other peers.
+	e.Dead node handling: When a peer is found to be unresponsive, its degree is decremented on the seed nodes, and the reporting peer's degree is updated accordingly.
+
+
+Description of the code:
   	SEED:
 		1. Create socket, Bind socket and then listening for request/messages
 		2. Once it receive the connect request from peer, it create separate thread
@@ -14,14 +54,13 @@ Description of the code:
 		5. It generate gossip message and also forward it and also generate liveness request 
 		6. If a peer is down it sends dead node message to seed node
 
-Details steps for compile and run:
 
+Details steps for compile and run:
 1. Open the project folder:
 	1. Open the file "config.txt" and put the System IP and any Port no. in the format of "IP:PORT"
 	2. Based on the no. of seed we have to put all Seed Address manually like above
 
 2. Go to the directory where seed.py and peer.py file is available using terminal
-  
 To compile seed:
 	3. Run the code using python3 seed.py
 	4. Based on no. of entries in config file, run different seeds with different port no. given in config file. Enter port no. only
