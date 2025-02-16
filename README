@@ -29,7 +29,8 @@ Key Concepts
 	a.Implemented in the peer selection process.
 	b.Peers are sorted based on their degree (number of connections) in descending order.
 	c.The top n/2 peers are selected, where n is the total number of peers in the network.
-	d.This creates a network topology where some nodes have many connections while others have few.
+	d.This creates a network topology where some nodes have many connections while others have few thereby ensuring power law distribution.
+	e. On further testing, we noticed an alpha value = 4.8 when we used 4 peer nodes, but increasing the number of peer nodes to over 20 brought the value of alpha to 3. Further increasing the no of nodes brings alpha to be between 2 and 3 thereby proving the power law distribution.
 
 6.Degree Management
 	a.The implementation maintains and updates the degree (number of connections) for each peer:
