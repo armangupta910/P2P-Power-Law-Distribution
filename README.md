@@ -39,7 +39,7 @@ The implementation uses three threads for different tasks:
 - This creates a network topology where some nodes have many connections while others have few, thereby ensuring power law distribution.
 - On further testing, we noticed an alpha value = 4.8 when we used 4 peer nodes, but increasing the number of peer nodes to over 20 brought the value of alpha to 3. Further increasing the number of nodes brings alpha to be between 2 and 3, thereby proving the power law distribution.
 
-![Power Law Distribution Graph](path/to/your/image.png)
+![Power Law Distribution Graph](demo.jpeg)
 
 ### 6. Degree Management
 
