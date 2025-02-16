@@ -1,54 +1,28 @@
-Received Connection from 127.0.0.1:1111 with initial degree 0
-Received Connection from 127.0.0.1:1111 with initial degree 0
-Received Connection from 127.0.0.1:2222 with initial degree 0
-Received Connection from 127.0.0.1:2222 with initial degree 0
-Received Connection from 127.0.0.1:1111 with initial degree 0
-Received Connection from 127.0.0.1:1111 with initial degree 0
-Received Connection from 127.0.0.1:2222 with initial degree 0
-Received Connection from 127.0.0.1:2222 with initial degree 0
-Received Connection from 127.0.0.1:3333 with initial degree 0
-Received Connection from 127.0.0.1:3333 with initial degree 0
-Received Connection from 127.0.0.1:1111 with initial degree 0
-Received Connection from 127.0.0.1:1111 with initial degree 0
-Received Connection from 127.0.0.1:1111 with initial degree 0
-Received Connection from 127.0.0.1:1111 with initial degree 0
-Received Connection from 127.0.0.1:2222 with initial degree 0
-Received Connection from 127.0.0.1:2222 with initial degree 0
-Received Connection from 127.0.0.1:1111 with initial degree 0
-Received Connection from 127.0.0.1:1111 with initial degree 0
-Received Connection from 127.0.0.1:2222 with initial degree 0
-Received Connection from 127.0.0.1:2222 with initial degree 0
-Received Connection from 127.0.0.1:1111 with initial degree 0
-Received Connection from 127.0.0.1:1111 with initial degree 0
-Received Connection from 127.0.0.1:2222 with initial degree 0
-Received Connection from 127.0.0.1:2222 with initial degree 0
-Received Connection from 127.0.0.1:1111 with initial degree 0
-Received Connection from 127.0.0.1:1111 with initial degree 0
-Received Connection from 127.0.0.1:2222 with initial degree 0
-Received Connection from 127.0.0.1:2222 with initial degree 0
-Received Connection from 127.0.0.1:1111 with initial degree 0
-Received Connection from 127.0.0.1:1111 with initial degree 0
-Received Connection from 127.0.0.1:1111 with initial degree 0
-Received Connection from 127.0.0.1:1111 with initial degree 0
-Received Connection from 127.0.0.1:1111 with initial degree 0
-Received Connection from 127.0.0.1:1111 with initial degree 0
-Received Connection from 127.0.0.1:2222 with initial degree 0
-Received Connection from 127.0.0.1:2222 with initial degree 0
-Received Connection from 127.0.0.1:1111 with initial degree 0
-Received Connection from 127.0.0.1:1111 with initial degree 0
-Received Connection from 127.0.0.1:2222 with initial degree 0
-Received Connection from 127.0.0.1:2222 with initial degree 0
-Received Connection from 127.0.0.1:3333 with initial degree 0
-Received Connection from 127.0.0.1:3333 with initial degree 0
-Received Connection from 127.0.0.1:1111 with initial degree 0
-Received Connection from 127.0.0.1:1111 with initial degree 0
-Received Connection from 127.0.0.1:2222 with initial degree 0
-Received Connection from 127.0.0.1:2222 with initial degree 0
-Received Connection from 127.0.0.1:3333 with initial degree 0
-Received Connection from 127.0.0.1:3333 with initial degree 0
-Received Connection from 127.0.0.1:4444 with initial degree 0
-Received Connection from 127.0.0.1:4444 with initial degree 0
-Received Connection from 127.0.0.1:5555 with initial degree 0
-Received Connection from 127.0.0.1:5555 with initial degree 0
-Received Connection from 127.0.0.1:6666 with initial degree 0
-Received Connection from 127.0.0.1:6666 with initial degree 0
+0.0.0.0:3 - Received Connection from 127.0.0.1:1111
+0.0.0.0:2 - Received Connection from 127.0.0.1:1111
+0.0.0.0:3 - Degree updated successfully - 127.0.0.1:1111
+0.0.0.0:2 - Degree updated successfully - 127.0.0.1:1111
+0.0.0.0:2 - Received Connection from 127.0.0.1:2222
+0.0.0.0:1 - Received Connection from 127.0.0.1:2222
+0.0.0.0:3 - Degree updated successfully - 127.0.0.1:1111
+0.0.0.0:2 - Degree updated successfully - 127.0.0.1:2222
+0.0.0.0:1 - Degree updated successfully - 127.0.0.1:2222
+0.0.0.0:2 - Degree updated successfully - 127.0.0.1:1111
+0.0.0.0:2 - Degree updated successfully - 127.0.0.1:2222
+0.0.0.0:1 - Degree updated successfully - 127.0.0.1:2222
+0.0.0.0:2 - Received Connection from 127.0.0.1:3333
+0.0.0.0:1 - Received Connection from 127.0.0.1:3333
+0.0.0.0:2 - Degree updated successfully - 127.0.0.1:3333
+0.0.0.0:1 - Degree updated successfully - 127.0.0.1:3333
+0.0.0.0:2 - Degree updated successfully - 127.0.0.1:2222
+0.0.0.0:2 - Degree updated successfully - 127.0.0.1:3333
+0.0.0.0:1 - Degree updated successfully - 127.0.0.1:2222
+0.0.0.0:1 - Degree updated successfully - 127.0.0.1:3333
+0.0.0.0:3 - Received Connection from 127.0.0.1:4444
+0.0.0.0:2 - Received Connection from 127.0.0.1:4444
+0.0.0.0:3 - Degree updated successfully - 127.0.0.1:4444
+0.0.0.0:2 - Degree updated successfully - 127.0.0.1:2222
+0.0.0.0:2 - Degree updated successfully - 127.0.0.1:4444
+0.0.0.0:3 - Degree updated successfully - 127.0.0.1:4444
+0.0.0.0:2 - Degree updated successfully - 127.0.0.1:4444
+0.0.0.0:1 - Degree updated successfully - 127.0.0.1:2222

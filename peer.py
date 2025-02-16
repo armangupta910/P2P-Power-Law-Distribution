@@ -204,7 +204,8 @@ def join_n_over_2_peers(complete_peer_list):
         for peer in selected_peers:
             print(f"Address: {peer['address']}, Degree: {peer['degree']}")
         
-        connect_peers(selected_peers)
+        return connect_peers(selected_peers)
+    return 0
 
 
 # It take complete peer list separated by comma from each seed and union them all
@@ -295,9 +296,10 @@ def connect_seeds():
     # Now perform the union operation on the combined list
     complete_peer_list = union_peer_lists(combined_peer_list)
     print("Peer List after processing all seeds:- ", complete_peer_list)
+    write_output_to_file(complete_peer_list)
     
-    for peer in complete_peer_list:
-        write_output_to_file(peer)
+    # for peer in complete_peer_list:
+    #     write_output_to_file(peer)
 
     # Power Law function to calculate degree and connect to relevant peers
     newDegree = join_n_over_2_peers(complete_peer_list)
@@ -305,7 +307,7 @@ def connect_seeds():
     print("The new degree of the peer is : ", newDegree)
     
     # After joining peers, update the degree
-    update_degree_to_seeds(newDegree)
+    update_degree_to_seeds(len(peers_connected))
 
 
 
@@ -402,7 +404,6 @@ def gossip():
         time.sleep(5)
 
 # create_workers(), work(), create_jobs() : Referred from internet
-# Source : https://github.com/attreyabhatt/Reverse-Shell/blob/master/Multi_Client%20(%20ReverseShell%20v2)/server.py
 # Create Worker Threads
 def create_workers():
    for _ in range(no_of_threads):

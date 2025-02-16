@@ -49,6 +49,7 @@ def remove_dead_node(message):
     if dead_node in peer_list:
         del peer_list[dead_node]
         print(f"Removed dead node: {dead_node}")
+        write_output_to_file(f"{MY_IP}:{PORT} - Removed dead node: {dead_node}")
     else:
         print(f"Dead node {dead_node} not found in peer list")
     
@@ -94,6 +95,7 @@ def handle_peer(conn, addr):
                     print("Received Increment request from :- ", peer_address+":"+peer_port)
                     response = incrementDegreeOfPeer(peer_address+":"+peer_port)
                     conn.send(response.encode('utf-8'))
+                    write_output_to_file(f"{MY_IP}:{PORT} - Degree updated successfully - {peer_address}:{peer_port}")
 
                 elif message.startswith("UPDATE:"):
                     # Handle degree update
@@ -101,6 +103,7 @@ def handle_peer(conn, addr):
                     _, peer_address, peer_port,  new_degree = message.split(":")
                     update_peer_degree(peer_address+peer_port, int(new_degree))
                     conn.send(f"Degree updated successfully - {peer_address}:{peer_port}".encode('utf-8'))
+                    write_output_to_file(f"{MY_IP}:{PORT} - Degree updated successfully - {peer_address}:{peer_port}")
 
                 elif "Dead Node" in message[0:9]:
                     remove_dead_node(message)
@@ -110,7 +113,7 @@ def handle_peer(conn, addr):
                     peer_address = str(addr[0])+":"+str(message[1])
                     peer_degree = int(message[2])  # This will be 0 initially
                     peer_list[peer_address] = peer_degree
-                    output = f"Received Connection from {peer_address} with initial degree {peer_degree}"
+                    output = f"{MY_IP}:{PORT} - Received Connection from {peer_address}"
                     print(output)
                     write_output_to_file(output)
                     PeerList = dict_to_string(peer_list)
