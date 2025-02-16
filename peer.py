@@ -187,23 +187,24 @@ def connect_peers(selected_peers):
 
     print(f"Connected to {len(peers_connected)} peers")
 
-def join_atmost_4_peers(complete_peer_list):
+
+def join_n_over_2_peers(complete_peer_list):
     if len(complete_peer_list) > 0:
-        # Determine the number of peers to connect to (1 to 4, or less if fewer peers are available)
-        limit = min(random.randint(1, len(complete_peer_list)), 4)
+        # Calculate n/2, where n is the total number of peers
+        n = len(complete_peer_list)
+        connect_count = max(n // 2, 1)  # Ensure at least 1 connection is attempted
         
-        # Randomly select peers to connect to
-        selected_peers = random.sample(complete_peer_list, limit)
+        # Sort the peer list based on degree in descending order
+        sorted_peers = sorted(complete_peer_list, key=lambda x: x['degree'], reverse=True)
         
-        print("Trying to connect to peers:")
+        # Select the top n/2 peers (or all peers if less than n/2 are available)
+        selected_peers = sorted_peers[:connect_count]
+        
+        print(f"Trying to connect to {len(selected_peers)} peers:")
         for peer in selected_peers:
             print(f"Address: {peer['address']}, Degree: {peer['degree']}")
         
-        return connect_peers(selected_peers)
-    else:
-        return 0
-
-
+        connect_peers(selected_peers)
 
 
 # It take complete peer list separated by comma from each seed and union them all
@@ -266,7 +267,7 @@ def update_degree_to_seeds(new_degree):
 
 
 # This function is used to connect to seed and send our IP address and port info to seed and then receives a list of peers connected to that seed separated by comma
-# After finding union it calls join_atmost_4_peers to connect to atmost peers
+# After finding union it calls join_n_over_2_peers to connect to atmost peers
 def connect_seeds():
     all_peer_lists = []
     for i in range(0, len(connect_seed_addr)):
@@ -299,7 +300,7 @@ def connect_seeds():
         write_output_to_file(peer)
 
     # Power Law function to calculate degree and connect to relevant peers
-    newDegree = join_atmost_4_peers(complete_peer_list)
+    newDegree = join_n_over_2_peers(complete_peer_list)
 
     print("The new degree of the peer is : ", newDegree)
     
